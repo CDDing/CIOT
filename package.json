@@ -2,6 +2,7 @@
   "dependencies": {
     "aedes": "^0.49.0",
     "express": "^4.18.2",
+    "ides": "^0.1.1",
     "mqtt": "^4.3.7",
     "net": "^1.0.2"
   }
