@@ -1,13 +1,13 @@
-// initialize the express application
 const express = require("express");
 const web_app = express();
 
-const port_web = 3000;
-
-var prs;
-
+const mqtt=require('mqtt')
 const aedes = require('aedes')();
 const mqtt_server = require('net').createServer(aedes.handle);
+
+const mqtt_client=mqtt.connect('mqtt://localhost:1883')
+
+const port_web = 3000;
 const port_mqtt = 1883;
 
 // initialize the Fitbit API client
@@ -17,6 +17,12 @@ const fitbit_client = new FitbitApiClient({
     clientSecret: "2c268bf83ea0806a41f37d5e8f55bd92",
     apiVersion: '1.2' // 1.2 is the default
 });
+
+var mqtt_topic = 'test'
+
+function mqtt_publishing() {
+    mqtt_client.publish(mqtt_topic,'Hello Dsssadsasdasdasdng');
+}
 
 // redirect the user to the Fitbit authorization page
 // 127.0.0.1:3001/authorize
@@ -71,3 +77,5 @@ aedes.on('subscribe', function (subscriptions, target_client) {
 aedes.on('publish', function (packet, target_client) {
     console.log(`Received message from client ${target_client}: ${packet.payload.toString()}`);
 });
+
+setInterval(mqtt_publishing, 2000);
