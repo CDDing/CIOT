@@ -1,9 +1,9 @@
 const aedes = require('aedes')();
-const server = require('net').createServer(aedes.handle);
-const port = 1883;
+const mqtt_server = require('net').createServer(aedes.handle);
+const port_mqtt = 1883;
 
-server.listen(port, function () {
-  console.log(`MQTT broker started and listening on port ${port}`);
+mqtt_server.listen(port_mqtt, function () {
+  console.log(`MQTT broker started and listening on port ${port_mqtt}`);
 });
 
 aedes.on('subscribe', function (subscriptions, client) {
