@@ -1,5 +1,6 @@
 const { AuthorizationCode } = require('simple-oauth2');
 const app = require('express')();
+const fs=require('fs');
 const callbackUrl = 'http://127.0.0.1:3000/callback';
 const client = new AuthorizationCode({
     client: {
@@ -15,8 +16,8 @@ const client = new AuthorizationCode({
     },
 });
 const authorizationUri = client.authorizeURL({
-    redirect_uri: callbackUrl,
     scope: 'activity cardio_fitness electrocardiogram heartrate location nutrition oxygen_saturation profile respiratory_rate settings sleep social temperature weight',
+    redirect_uri: callbackUrl,
 }).replace('api','www');
 
 app.get('/auth', (req, res) => {
@@ -27,9 +28,17 @@ app.get('/callback', async (req, res) => {
     const { code } = req.query;
     const options = {
         code,
+        redirect_uri:callbackUrl,
     };
     try {
         const accessToken = await client.getToken(options);
+        fs.writeFile('AccessToken.json',fs.accessToken.token,(err)=>{
+            if(err){
+                console.error(err);
+                return;
+            }
+            console.log('Get AccessToken');
+        })
         console.log('The resulting token: ', accessToken);
         return res.status(200).json(accessToken.token);
     } catch (error) {
@@ -41,6 +50,11 @@ app.get('/callback', async (req, res) => {
 app.get('/', (req, res) => {
     res.send('Hello<br><a href="/auth">Fitbit API</a>');
 });
+app.get('/getdata',(req,res)=>{
+    fs.readFile('AccessToken.json','utf-8',function(err,data){
+        console.log(data);
+    });
+})
 app.listen(3000, () => {
     console.log("ㅎㅇ");
 });
