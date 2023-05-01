@@ -18,7 +18,7 @@ const url_callback = url_main + '/callback'
 const FitbitApiClient = require("fitbit-node");
 const fitbit_client = new FitbitApiClient({
     clientId: "23QZCX",
-    clientSecret: "2c268bf83ea0806a41f37d5e8f55bd92",
+    clientSecret: "f8938cd6e8acd15e6fbc4fc34fbdbcd0",
     apiVersion: '1.2' // 1.2 is the default
 });
 
@@ -39,6 +39,8 @@ var get_hrv_intraday_by_interval = "/hrv/date/" + date_start + '/' + date_end + 
 var get_breathing_rate_intraday_by_interval = "/br/date/" + date_start + '/' + date_end + "/all.json" //https://dev.fitbit.com/build/reference/web-api/intraday/get-br-intraday-by-interval/
 var get_spo2_intraday_by_interval = "/spo2/date/" + date_start + '/' + date_end + "/all.json" //https://dev.fitbit.com/build/reference/web-api/intraday/get-spo2-intraday-by-interval/
 
+var target_json = get_breathing_rate_intraday_by_interval; //select and change json to get it.
+
 function mqtt_publishing() {
     mqtt_client.publish(mqtt_topic,'Hello Dsssadsasdasdasdng');
 }
@@ -55,10 +57,11 @@ web_app.get("/callback", (req, res) => {
     // exchange the authorization code we just received for an access token
     fitbit_client.getAccessToken(req.query.code, url_callback).then(result => {
         // use the access token to fetch the user's profile information
-        fitbit_client.get(get_hrv_intraday_by_interval, result.access_token).then(results => {
+        fitbit_client.get(target_json, result.access_token).then(results => {
             res.send(results[0]);
 
             //console.log(results[0][gender][....]);
+            //edit here to do something.
 
         }).catch(err => {
             res.status(err.status).send(err);
