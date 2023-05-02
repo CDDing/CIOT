@@ -113,5 +113,8 @@ app.get('/refresh', (req, res) => {
     });
 })
 app.listen(3000, () => {
-    console.log("ㅎㅇ");
+    console.log('click here to start http://127.0.0.1:3000/auth');
+    console.log('test json http://127.0.0.1:3000/getdata?request_json=activities/heart/date/2023-05-01/2023-05-01/1sec/time/10:10/10:12.json');
+    console.log('test json http://127.0.0.1:3000/getdata?request_json=hrv/date/2023-05-01/all.json');
+    console.log('test json http://127.0.0.1:3000/getdata?request_json=sleep/date/2023-05-01.json');
 });
