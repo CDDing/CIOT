@@ -4,10 +4,12 @@ const Request = require('request');
 const fs = require('fs');
 const callbackUrl = 'http://127.0.0.1:3000/callback';
 const getURL = `https://api.fitbit.com/1.2/user/-/`;
+const clientID='23QSN4'
+const clientSecret='6f8b5e4aae2c9f90238bf7bc721ebc9a'
 const client = new AuthorizationCode({
     client: {
-        id: '23QSN4',
-        secret: '6f8b5e4aae2c9f90238bf7bc721ebc9a',
+        id: clientID,
+        secret: clientSecret,
     },
     auth: {
         tokenHost: 'https://api.fitbit.com/',
@@ -77,6 +79,36 @@ app.get('/getdata', (req, res) => {
         }).then(results=>{
             res.send(results[0]);
         });
+
+    });
+})
+app.get('/refresh', (req, res) => {
+    fs.readFile('AccessToken.json', 'utf-8', function (err, data) {
+        const Token = JSON.parse(data);
+        var refresh_token=Token.refresh_token;
+        var Option={
+            url:'https://api.fitbit.com/oauth2/token',
+            method:'POST',
+            headers:{
+                Authorization: 'Basic '+Buffer.from(clientID+':'+clientSecret).toString('base64'),
+                'Content-Type':'application/x-www-form-urlencoded'
+            },
+            form:{
+                grant_type:'refresh_token',
+                refresh_token:refresh_token
+            }
+        };
+        Request(Option, function(error, response, body) {
+            if (error) throw new Error(error);
+            fs.writeFile('AccessToken.json', JSON.stringify(body), (err) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                console.log('Get AccessToken');
+            })
+            res.send(body);
+          });
 
     });
 })
