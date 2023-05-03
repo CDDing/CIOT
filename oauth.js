@@ -3,17 +3,17 @@ const app = require('express')();
 const Request = require('request');
 const aedes = require('aedes')();
 const mqtt_server = require('net').createServer(aedes.handle);
-const mqtt=require('mqtt')
-const Brokerclient=mqtt.connect('mqtt://localhost:1883')
+const mqtt = require('mqtt')
+const Brokerclient = mqtt.connect('mqtt://localhost:1883')
 const fs = require('fs');
-const cors=require('cors');
+const cors = require('cors');
 const callbackUrl = 'http://127.0.0.1:3000/callback';
 const getURL = `https://api.fitbit.com/1.2/user/-/`;
-const clientID='23QSN4'
-const clientSecret='6f8b5e4aae2c9f90238bf7bc721ebc9a'
+const clientID = '23QSN4'
+const clientSecret = '6f8b5e4aae2c9f90238bf7bc721ebc9a'
 
-var publish_comment="";
-var subscribe_comment="";
+var publish_comment = "";
+var subscribe_comment = "";
 const client = new AuthorizationCode({
     client: {
         id: clientID,
@@ -76,19 +76,19 @@ app.get('/getdata', (req, res) => {
                 json: true
             }, (error, response, body) => {
                 if (error) {
-                    console.log(req.query.request_json+'Request Error');
+                    console.log(req.query.request_json + 'Request Error');
                     reject(error);
                 } else {
-                    console.log(req.query.request_json+'Request Success');
+                    console.log(req.query.request_json + 'Request Success');
                     resolve([
                         body,
                         response
                     ]);
                 }
             });
-        }).then(results=>{
+        }).then(results => {
             res.send(results[0]);
-            console.log(req.query.request_json+'Request Sent');
+            console.log(req.query.request_json + 'Request Sent');
         });
 
     });
@@ -96,20 +96,20 @@ app.get('/getdata', (req, res) => {
 app.get('/refresh', (req, res) => {
     fs.readFile('AccessToken.json', 'utf-8', function (err, data) {
         const Token = JSON.parse(data);
-        var refresh_token=Token.refresh_token;
-        var Option={
-            url:'https://api.fitbit.com/oauth2/token',
-            method:'POST',
-            headers:{
-                Authorization: 'Basic '+Buffer.from(clientID+':'+clientSecret).toString('base64'),
-                'Content-Type':'application/x-www-form-urlencoded'
+        var refresh_token = Token.refresh_token;
+        var Option = {
+            url: 'https://api.fitbit.com/oauth2/token',
+            method: 'POST',
+            headers: {
+                Authorization: 'Basic ' + Buffer.from(clientID + ':' + clientSecret).toString('base64'),
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            form:{
-                grant_type:'refresh_token',
-                refresh_token:refresh_token
+            form: {
+                grant_type: 'refresh_token',
+                refresh_token: refresh_token
             }
         };
-        Request(Option, function(error, response, body) {
+        Request(Option, function (error, response, body) {
             if (error) throw new Error(error);
             fs.writeFile('AccessToken.json', JSON.stringify(body), (err) => {
                 if (err) {
@@ -119,7 +119,7 @@ app.get('/refresh', (req, res) => {
                 console.log('Get AccessToken');
             })
             res.send(body);
-          });
+        });
 
     });
 })
@@ -132,18 +132,51 @@ app.listen(3000, () => {
 app.get('/getpublish', (req, res) => {
     res.send(publish_comment);
 });
+app.get('/getrealtime', (req, res) => {
+    var requestURL = `https://api.fitbit.com/1.2/user/-/`;
+    var request_json = ['profile.json'];
+    var responsed_data=[];
+    fs.readFile('AccessToken.json', 'utf-8', function (err, data) {
+        const accessToken = JSON.parse(data);
+        for (var i in request_json) {
+            var getdata = new Promise((resolve, reject) => {
+                Request({
+                    url: requestURL + i,
+                    method: 'GET',
+                    headers: {
+                        Authorization: 'Bearer ' + accessToken.access_token
+                    },
+                    json: true
+                }, (error, response, body) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve([
+                            body,
+                            response
+                        ]);
+                    }
+                });
+            }).then(results => {
+                responsed_data.push(results[0]);
+                            });
+        }
+    });
+    res.send(responsed_data);
+    console.log(responsed_data);
+});
 const port_mqtt = 1883;
 
 mqtt_server.listen(port_mqtt, function () {
-  console.log(`MQTT broker started and listening on port ${port_mqtt}`);
+    console.log(`MQTT broker started and listening on port ${port_mqtt}`);
 });
 
 aedes.on('subscribe', function (subscriptions, client) {
-  console.log(`Client ${client} subscribed to topics: ${JSON.stringify(subscriptions)}`);
-  subscribe_comment=subscribe_comment+JSON.stringify(subscriptions)+"\n";
+    console.log(`Client ${client} subscribed to topics: ${JSON.stringify(subscriptions)}`);
+    subscribe_comment = subscribe_comment + JSON.stringify(subscriptions) + "\n";
 });
 
 aedes.on('publish', function (packet, client) {
-  console.log(`Received message from client ${client}: ${packet.payload.toString()}`);
-  publish_comment=publish_comment+packet.payload.toString()+"\n";
+    console.log(`Received message from client ${client}: ${packet.payload.toString()}`);
+    publish_comment = publish_comment + packet.payload.toString() + "\n";
 });
