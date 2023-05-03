@@ -138,7 +138,8 @@ app.get('/getrealtime', (req, res) => {
     var responsed_data=[];
     fs.readFile('AccessToken.json', 'utf-8', function (err, data) {
         const accessToken = JSON.parse(data);
-        for (var i in request_json) {
+        for (var i of request_json) {
+            //console.log(requestURL + i);
             var getdata = new Promise((resolve, reject) => {
                 Request({
                     url: requestURL + i,
@@ -163,7 +164,6 @@ app.get('/getrealtime', (req, res) => {
         }
     });
     res.send(responsed_data);
-    console.log(responsed_data);
 });
 const port_mqtt = 1883;
 
