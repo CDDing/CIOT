@@ -28,22 +28,8 @@
         <h2 id="h2"></h2>
     </div>
     <canvas id="myCanvas" width="640" height="480"></canvas>
-    <script>
-        const axios = require('axios');
-        const text = document.getElementById("text");
-        const button = document.getElementById("button");
-        const h1 = document.getElementById("h1");
-        const url = "http://127.0.0.1/";
-        h1.textContent = url + text.value;
-        button.addEventListener('click', () => {
-            axios.get(url + text.value)
-            .then(response => {
-                h1.textContent = response.data;
-            })
-            .catch(error => {
-                h1.textContent = error;
-            });
-        })
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="CIOT.js">
     </script>
 </body>
 

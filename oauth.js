@@ -2,6 +2,7 @@ const { AuthorizationCode } = require('simple-oauth2');
 const app = require('express')();
 const Request = require('request');
 const fs = require('fs');
+const cors=require('cors');
 const callbackUrl = 'http://127.0.0.1:3000/callback';
 const getURL = `https://api.fitbit.com/1.2/user/-/`;
 const clientID='23QSN4'
@@ -23,7 +24,7 @@ const authorizationUri = client.authorizeURL({
     scope: 'activity cardio_fitness electrocardiogram heartrate location nutrition oxygen_saturation profile respiratory_rate settings sleep social temperature weight',
     redirect_uri: callbackUrl,
 }).replace('api', 'www');
-
+app.use(cors());
 app.get('/auth', (req, res) => {
     console.log(authorizationUri);
     res.redirect(authorizationUri);
@@ -68,8 +69,10 @@ app.get('/getdata', (req, res) => {
                 json: true
             }, (error, response, body) => {
                 if (error) {
+                    console.log(req.query.request_json+'Request Error');
                     reject(error);
                 } else {
+                    console.log(req.query.request_json+'Request Success');
                     resolve([
                         body,
                         response
@@ -78,6 +81,7 @@ app.get('/getdata', (req, res) => {
             });
         }).then(results=>{
             res.send(results[0]);
+            console.log(req.query.request_json+'Request Sent');
         });
 
     });
