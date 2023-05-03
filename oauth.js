@@ -1,12 +1,19 @@
 const { AuthorizationCode } = require('simple-oauth2');
 const app = require('express')();
 const Request = require('request');
+const aedes = require('aedes')();
+const mqtt_server = require('net').createServer(aedes.handle);
+const mqtt=require('mqtt')
+const Brokerclient=mqtt.connect('mqtt://localhost:1883')
 const fs = require('fs');
 const cors=require('cors');
 const callbackUrl = 'http://127.0.0.1:3000/callback';
 const getURL = `https://api.fitbit.com/1.2/user/-/`;
 const clientID='23QSN4'
 const clientSecret='6f8b5e4aae2c9f90238bf7bc721ebc9a'
+
+var publish_comment="";
+var subscribe_comment="";
 const client = new AuthorizationCode({
     client: {
         id: clientID,
@@ -121,4 +128,22 @@ app.listen(3000, () => {
     console.log('test json http://127.0.0.1:3000/getdata?request_json=activities/heart/date/2023-05-01/2023-05-01/1sec/time/10:10/10:12.json');
     console.log('test json http://127.0.0.1:3000/getdata?request_json=hrv/date/2023-05-01/all.json');
     console.log('test json http://127.0.0.1:3000/getdata?request_json=sleep/date/2023-05-01.json');
+});
+app.get('/getpublish', (req, res) => {
+    res.send(publish_comment);
+});
+const port_mqtt = 1883;
+
+mqtt_server.listen(port_mqtt, function () {
+  console.log(`MQTT broker started and listening on port ${port_mqtt}`);
+});
+
+aedes.on('subscribe', function (subscriptions, client) {
+  console.log(`Client ${client} subscribed to topics: ${JSON.stringify(subscriptions)}`);
+  subscribe_comment=subscribe_comment+JSON.stringify(subscriptions)+"\n";
+});
+
+aedes.on('publish', function (packet, client) {
+  console.log(`Received message from client ${client}: ${packet.payload.toString()}`);
+  publish_comment=publish_comment+packet.payload.toString()+"\n";
 });
