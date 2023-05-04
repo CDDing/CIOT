@@ -10,7 +10,8 @@ setInterval(
     ()=>{
         axios.get(request_fitbit_url)
         .then(response => {
-            h1.textContent = response.data[0];
+            h1.textContent = response.data[0].user.age;
+            console.log(response);
             //받아온 것에 변화가 있을 때 해당 부분 수정
         })
         .catch(error => {

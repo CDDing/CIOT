@@ -135,7 +135,8 @@ app.get('/getpublish', (req, res) => {
 app.get('/getrealtime', (req, res) => {
     var requestURL = `https://api.fitbit.com/1.2/user/-/`;
     var request_json = ['profile.json'];
-    var responsed_data=[];
+    var promises = [];
+    var responsed_data = [];
     fs.readFile('AccessToken.json', 'utf-8', function (err, data) {
         const accessToken = JSON.parse(data);
         for (var i of request_json) {
@@ -160,10 +161,16 @@ app.get('/getrealtime', (req, res) => {
                 });
             }).then(results => {
                 responsed_data.push(results[0]);
-                            });
+            });
+            promises.push(getdata);
         }
+        Promise.all(promises).then((results) => {
+            res.send(responsed_data);
+        }).catch((error) => {
+            console.error(error);
+            res.status(500).send('Internal Server Error');
+        });
     });
-    res.send(responsed_data);
 });
 const port_mqtt = 1883;
 
