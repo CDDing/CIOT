@@ -9,8 +9,26 @@ const fs = require('fs');
 const cors = require('cors');
 const callbackUrl = 'http://127.0.0.1:3000/callback';
 const getURL = `https://api.fitbit.com/1.2/user/-/`;
-const clientID = '23QSN4'
-const clientSecret = '6f8b5e4aae2c9f90238bf7bc721ebc9a'
+
+const clientID = '23QZCX'
+const clientSecret = 'aa1368dd0f04cb0c738a83d9abf7e805'
+
+//var today = new Date(2022, 9, 3, 9, 9, 0); //sample
+var today = new Date();
+
+var today_hour = (today.getHours() < 10) ? '0' + today.getHours() : "" + today.getHours();
+var today_min = (today.getMinutes() < 10) ? '0' + today.getMinutes() : "" + today.getMinutes();
+var today_min_next = (today.getMinutes() + 1 < 10) ? '0' + (today.getMinutes() + 1) : "" + (today.getMinutes() + 1);
+var today_time1 = today_hour + ":" + today_min;
+var today_time2 = today_hour + ":" + today_min_next;
+
+var detail_level = '1sec' //can use    1sec | 1min | 5min | 15min  string
+
+var heart_rate_now = "/activities/heart/date/today/today/" + detail_level + '/time/' + today_time1 + '/' + today_time2 + ".json";
+
+var test_heart_rate_now = "/activities/heart/date/today/today/" + detail_level + '/time/13:40/13:41.json';
+
+var request_json_list = [test_heart_rate_now];
 
 var publish_comment = "";
 var subscribe_comment = "";
@@ -134,12 +152,12 @@ app.get('/getpublish', (req, res) => {
 });
 app.get('/getrealtime', (req, res) => {
     var requestURL = `https://api.fitbit.com/1.2/user/-/`;
-    var request_json = ['profile.json'];
+    //var request_json = ['profile.json'];
     var promises = [];
     var responsed_data = [];
     fs.readFile('AccessToken.json', 'utf-8', function (err, data) {
         const accessToken = JSON.parse(data);
-        for (var i of request_json) {
+        for (var i of request_json_list) {
             //console.log(requestURL + i);
             var getdata = new Promise((resolve, reject) => {
                 Request({
@@ -172,6 +190,7 @@ app.get('/getrealtime', (req, res) => {
         });
     });
 });
+
 const port_mqtt = 1883;
 
 mqtt_server.listen(port_mqtt, function () {

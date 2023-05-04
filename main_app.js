@@ -33,7 +33,7 @@ var detail_level = '1sec' //can use         1sec | 1min | 5min | 15min
 //date_start = 'today', date_end = 'today';  //change date to today.
 
 var time_start = "00:10"; //start time of start date
-var time_end = "00:13"; //end time of end date
+var time_end = "00:11"; //end time of end date
 
 var get_heart_rate_time_series_by_date = "/activities/heart/date/" + date_start + '/' + period_spec + ".json"
 var get_heart_rate_time_series_by_date_range = "/activities/heart/date/" + date_start + '/' + date_end + ".json"
@@ -43,6 +43,9 @@ var get_heart_rate_intraday_by_interval_detail = "/activities/heart/date/" + dat
 var get_hrv_intraday_by_interval = "/hrv/date/" + date_start + '/' + date_end + "/all.json" //https://dev.fitbit.com/build/reference/web-api/intraday/get-hrv-intraday-by-interval
 var get_breathing_rate_intraday_by_interval = "/br/date/" + date_start + '/' + date_end + "/all.json" //https://dev.fitbit.com/build/reference/web-api/intraday/get-br-intraday-by-interval/
 var get_spo2_intraday_by_interval = "/spo2/date/" + date_start + '/' + date_end + "/all.json" //https://dev.fitbit.com/build/reference/web-api/intraday/get-spo2-intraday-by-interval/
+
+var get_temp_core_interval = "/temp/core/date/" + date_start + '/' + date_end + ".json" //https://dev.fitbit.com/build/reference/web-api/temperature/get-temperature-core-summary-by-interval
+var get_temp_skin_interval = "/temp/skin/date/" + date_start + '/' + date_end + ".json"
 
 var target_json = get_heart_rate_intraday_by_interval_detail; //select and change json to get it.
 
@@ -65,8 +68,13 @@ web_app.get("/callback", (req, res) => {
         fitbit_client.get(target_json, result.access_token).then(results => {
             res.send(results[0]);
 
-            //console.log(results[0][gender][....]);
-            //edit here to do something.
+            var now = new Date();
+            var minutes = now.getSeconds();
+
+            console.log(results[0]['activities-heart-intraday']['dataset']['0']['time']); //시간 접근
+            console.log(results[0]['activities-heart-intraday']['dataset']['0']['value']); //심박수 접근
+
+            console.log(typeof results[0]['activities-heart-intraday']['dataset']['0']['time']);
 
         }).catch(err => {
             res.status(err.status).send(err);
