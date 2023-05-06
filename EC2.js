@@ -21,6 +21,8 @@ var stress_level = 0 // 0 ~ 4;
 
 var responsed_data = [];
 
+var user_age = 25;
+
 //var today = new Date(2022, 9, 3, 9, 9, 0); //sample
 var today = new Date();
 
@@ -268,21 +270,25 @@ function calc_stress() {
 
     var heart_rate = responsed_data[0]['activities-heart-intraday']['dataset'][0]['value'];
 
-    if(heart_rate < 65) {
+    var max_hr = 220 - user_age;
+
+    if(heart_rate < (max_hr * 0.4)) {
         stress_level = 0;
     }
-    else if(heart_rate < 90) {
+    else if(heart_rate < (max_hr * 0.5)) {
         stress_level = 1;
     }
-    else if(heart_rate < 115) {
+    else if(heart_rate < (max_hr * 0.6)) {
         stress_level = 2;
     }
-    else if(heart_rate < 130) {
+    else if(heart_rate < (max_hr * 0.7)) {
         stress_level = 3;
     }
     else {
         stress_level = 4;
     }
+
+    console.log(stress_level);
 }
 
 get_json();
