@@ -13,20 +13,15 @@ setInterval(
         .then(response => {
             //h1.textContent = response.data[0].user.age;
 
-            //h1.textContent = response.data[0].activities-heart-intraday.dataset['0'].time;
-            //h1.textContent = response.data[0]['activities-heart-intraday']['dataset']['0']['time'];
-            //h1.textContent = response.data[0]['activities-heart-intraday']['dataset'];
-            //h2.textContent = response.data[0].activities-heart-intraday.dataset['0'].value;
-            //h2.textContent = response.data[0]['activities-heart-intraday']['dataset']['0']['value'];
-            
-            // for (var i of response.data[0]['activities-heart-intraday']) {
-            //     console.log(i);
-            //     console.log('\n');
-            // }
+            console.log("heart rate time : " + response.data[0]['activities-heart-intraday']['dataset'][0]['time']);
+            console.log("heart rate value : " + response.data[0]['activities-heart-intraday']['dataset'][0]['value']);
 
-            //console.log(response.data[0]);
-            console.log(response.data[0]['activities-heart-intraday']);
-            //console.log(response.data[0]['activities-heart-intraday']['0']["time"]);
+            console.log("hrv : " + response.data[1]);
+
+            console.log("br : " + response.data[2]);
+
+            console.log("spo2 : " + response.data[3]);
+
             //console.log(response);
             //받아온 것에 변화가 있을 때 해당 부분 수정
         })
@@ -34,8 +29,10 @@ setInterval(
             console.log(error);
         });
     },
-    2000
+    60000
 );
+
+
 setInterval(
     ()=>{
         axios.get(request_publish_url)
