@@ -15,6 +15,10 @@ AWS.config.update({
 });
 const s3 = new AWS.S3();
 
+var heart_rate_data = [
+    [0, 0, 0, 0]
+];
+
 const fs = require('fs');
 const cors = require('cors');
 const callbackUrl = 'http://127.0.0.1:3000/callback';
@@ -31,13 +35,16 @@ var responsed_data = [];
 
 var user_age = 25;
 
-//var today = new Date(2022, 9, 3, 9, 9, 0); //sample
+//var today = new Date(2023, 9, 3, 9, 9, 0); //sample
 var today = new Date();
 
 var today_full = today.getFullYear() + '-' + ((today.getMonth() < 9) ? '0' + (today.getMonth() + 1) : "" + (today.getMonth() + 1)) + '-' + ((today.getDate() < 10) ? '0' + today.getDate() : "" + today.getDate());
 var today_hour = (today.getHours() < 10) ? '0' + today.getHours() : "" + today.getHours();
-var today_min = (today.getMinutes() < 10) ? '0' + today.getMinutes() : "" + today.getMinutes();
-var today_min_next = (today.getMinutes() + 1 < 10) ? '0' + (today.getMinutes() + 1) : "" + (today.getMinutes() + 1);
+
+var correct_min = today.getMinutes() - 1;
+
+var today_min = (correct_min < 10) ? '0' + correct_min : "" + correct_min;
+var today_min_next = (today.getMinutes() < 10) ? '0' + today.getMinutes() : "" + today.getMinutes();
 var today_time1 = today_hour + ":" + today_min;
 var today_time2 = today_hour + ":" + today_min_next;
 
@@ -49,7 +56,7 @@ var br_now = "/br/date/today/today/all.json";
 var spo2_now = "/spo2/date/today/today/all.json";
 
 var test_heart_rate_now = "/activities/heart/date/2023-05-04/2023-05-04/" + detail_level + '/time/13:40/13:41.json';
-//var test_heart_rate_now = "/activities/heart/date/" + today_full + '/' + today_full + '/' + detail_level + '/time/13:40/13:41.json';
+//var test_heart_rate_now = "/activities/heart/date/" + today_full + '/' + today_full + '/' + detail_level + '/time/' + today_time1 + '/' + today_time2 + '.json';
 
 //var request_json_list = [heart_rate_now, hrv_now, br_now, spo2_now];
 
@@ -80,6 +87,113 @@ function set_time_now(act) {
 
     }
 }
+
+
+function modify_array_data(today, timeline, HR, SRLV) {
+    const newRow = [today, timeline, HR, SRLV];
+  
+    heart_rate_data.push(newRow);
+}
+
+function download_heart_rate() {
+    const downloadParams = {
+        Bucket: 'fitbit-json', //대상 버킷
+        Key: 'user1.json', //대상 파일
+    };
+    
+    s3.getObject(downloadParams, function(err, data) {
+        if (err) {
+            console.log('Error downloading file:', err);
+        } else {
+            const jsonData = data.Body.toString();
+            const heart_rate_data = JSON.parse(jsonData);
+            console.log('File downloaded successfully');
+            //console.log('Array data:', arrayData);
+        }
+    });  
+}
+
+function upload_heart_rate() {
+    const uploadParams = {
+        Bucket: 'fitbit-json',
+        Key: 'test.json',
+        Body: '',
+    };
+    
+    const jsonData = JSON.stringify(heart_rate_data);
+
+    uploadParams.Body = jsonData;
+    
+    s3.upload(uploadParams, function(err, data) {
+        if (err) {
+            console.log('Error uploading file:', err);
+        } else {
+            console.log('File uploaded successfully:', data.Location);
+        }
+    });
+}
+
+function upload_access_token() {
+    const params = {
+        Bucket: 'fitbit-json',
+        ACL: 'public-read',
+    };
+    
+    s3.createBucket(params, function(err, data) {
+        if (err) {
+            console.log('Error creating bucket:', err);
+        }
+        else {
+            console.log('Bucket created successfully:', data.Location);
+        }
+    });
+    
+    const uploadParams = {
+        Bucket: 'fitbit-json', //대상 버킷
+        Key: 'AccessToken.json', //키, 즉 파일 이름
+        Body: '', //내용, 즉 데이터. 하단에서 채워넣음
+    };
+    
+    //json 파일 읽어오는 과정
+    const jsonFile = 'AccessToken.json'; //경로 및 대상 파일 지정
+    const file_read = fs.createReadStream(jsonFile);
+    file_read.on('error', function(err) {
+        console.log('Error reading file:', err);
+    });
+    
+    //내용 채움
+    uploadParams.Body = file_read;
+    
+    s3.upload(uploadParams, function(err, data) { //업로드
+        if (err) {
+            console.log('Error uploading file:', err);
+        } else {
+            console.log('File uploaded successfully:', data.Location);
+        }
+    });
+}
+
+function download_access_token() {
+    const downloadParams = {
+        Bucket: 'fitbit-json', //대상 버킷
+        Key: 'user1.json', //대상 파일
+    };
+      
+    const download_path = 'user1.json'; //다운 받을 경로
+      
+    const file_write = fs.createWriteStream(download_path);
+      
+    s3.getObject(downloadParams)
+      .createReadStream()
+      .pipe(file_write)
+      .on('error', function(err) {
+        console.log('Error downloading file:', err);
+    })
+      .on('close', function() {
+        console.log('File downloaded successfully');
+    }); //이게 다운로드인듯    
+}
+
 
 var publish_comment = "";
 var subscribe_comment = "";
@@ -196,10 +310,9 @@ app.get('/refresh', (req, res) => {
     });
 })
 app.listen(3000, () => {
-    console.log('click here to start http://127.0.0.1:3000/auth');
-    console.log('test json http://127.0.0.1:3000/getdata?request_json=activities/heart/date/2023-05-01/2023-05-01/1sec/time/10:10/10:12.json');
-    console.log('test json http://127.0.0.1:3000/getdata?request_json=hrv/date/2023-05-01/all.json');
-    console.log('test json http://127.0.0.1:3000/getdata?request_json=sleep/date/2023-05-01.json');
+    console.log('click here to start http://127.0.0.1:3000/auth\n');
+
+    console.log('test json http://127.0.0.1:3000/getdata?request_json=' + test_heart_rate_now + "\n");
 });
 app.get('/getpublish', (req, res) => {
     res.send(publish_comment);
@@ -208,6 +321,8 @@ app.get('/getrealtime', (req, res) => {
     var requestURL = 'https://api.fitbit.com/1.2/user/-/';
 
     set_time_now(active_element);
+    
+    //download_access_token();
 
     var promises = [];
     //var responsed_data = [];
@@ -266,6 +381,7 @@ aedes.on('publish', function (packet, client) {
 
 function get_json() {
     axios.get("http://127.0.0.1:3000/getrealtime");
+
 }
 
 function calc_stress() {
@@ -297,12 +413,16 @@ function calc_stress() {
     }
 
     console.log(stress_level);
+
+    download_heart_rate();
+    modify_array_data(today_full, today_time1, responsed_data[0]['activities-heart-intraday']['dataset'][0]['value'], stress_level);
+    upload_heart_rate();
 }
 
 get_json();
 setInterval(get_json, 60000);
 
-setInterval(calc_stress, 6000);
+setInterval(calc_stress, 60000);
 
 function mqtt_publish() {
     mqtt_client.publish('stress_level', stress_level.toString());
@@ -310,61 +430,18 @@ function mqtt_publish() {
 
 setInterval(mqtt_publish, 3000);
 
+function testing() {
 
 
-const params = {
-    Bucket: 'fitbit-json',
-    ACL: 'public-read',
-};
+    calc_stress();
 
-s3.createBucket(params, function(err, data) {
-    if (err) {
-        console.log('Error creating bucket:', err);
-    }
-    else {
-        console.log('Bucket created successfully:', data.Location);
-    }
-});
+    console.log(heart_rate_data);
+}
 
-const uploadParams = {
-    Bucket: 'fitbit-json', //대상 버킷
-    Key: 'AccessToken.json', //키, 즉 파일 이름
-    Body: '', //내용, 즉 데이터. 하단에서 채워넣음
-};
+setTimeout(() => {
+    testing();
+}, 3000); // 2000ms(2초) 후에 실행
 
-//json 파일 읽어오는 과정
-const jsonFile = 'AccessToken.json'; //경로 및 대상 파일 지정
-const file_read = fs.createReadStream(jsonFile);
-file_read.on('error', function(err) {
-    console.log('Error reading file:', err);
-});
 
-//내용 채움
-uploadParams.Body = file_read;
 
-s3.upload(uploadParams, function(err, data) { //업로드
-    if (err) {
-        console.log('Error uploading file:', err);
-    } else {
-        console.log('File uploaded successfully:', data.Location);
-    }
-});
-
-const downloadParams = {
-  Bucket: 'fitbit-json', //대상 버킷
-  Key: 'AccessToken.json', //대상 파일
-};
-
-const download_path = 'AccessToken.json'; //다운 받을 경로
-
-const file_write = fs.createWriteStream(download_path);
-
-s3.getObject(downloadParams)
-  .createReadStream()
-  .pipe(file_write)
-  .on('error', function(err) {
-    console.log('Error downloading file:', err);
-  })
-  .on('close', function() {
-    console.log('File downloaded successfully');
-}); //이게 다운로드인듯
+//console.log(test_heart_rate_now);
