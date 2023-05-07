@@ -7,7 +7,6 @@ const h3 = document.getElementById("h3");
 const request_fitbit_url = "http://127.0.0.1:3000/getrealtime";
 const request_publish_url = "http://127.0.0.1:3000/getpublish";
 
-var AWS = require('aws-sdk');
 AWS.config.update({
     accessKeyId: 'AKIA56MQOH3C7X25TRU2',
     secretAccessKey: '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',
@@ -43,35 +42,25 @@ function download_heart_rate() {
 // console.log("br : " + response.data[2]);
 // console.log("spo2 : " + response.data[3]);
 
-setInterval(
-    ()=>{
-        axios.get(request_fitbit_url)
-        .then(response => {
-            download_heart_rate();
-            h1.textContent = '['+heart_rate_data[0][0]+','+heart_rate_data[0][1]
-            +','+heart_rate_data[0][2]+','+heart_rate_data[0][3]; //stress level
+function display_heart_rate() {
+    download_heart_rate();
 
-            
+    h1.textContent = '['+heart_rate_data[0][0]+', '+heart_rate_data[0][1]+', '+heart_rate_data[0][2]+', '+heart_rate_data[0][3] + ']';
+}
 
-        })
-        .catch(error => {
-            console.log(error);
-        });
-    },
-    60000
-);
+function display_mqtt() {
+    axios.get(request_publish_url)
+    .then(response => {
+        h3.textContent = response.data;
+        //받아온 것에 변화가 있을 때 해당 부분 수정
+    })
+    .catch(error => {
+        console.log(error);
+    });
+}
 
+display_heart_rate();
+setInterval(display_heart_rate, 3000);
 
-setInterval(
-    ()=>{
-        axios.get(request_publish_url)
-        .then(response => {
-            h3.textContent = response.data;
-            //받아온 것에 변화가 있을 때 해당 부분 수정
-        })
-        .catch(error => {
-            console.log(error);
-        });
-    },
-    1000
-);
+display_mqtt();
+setInterval(display_mqtt, 3000);
