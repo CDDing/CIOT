@@ -376,7 +376,7 @@ aedes.on('subscribe', function (subscriptions, client) {
 
 aedes.on('publish', function (packet, client) {
     console.log(`Received message from client ${client}: ${packet.payload.toString()}`);
-    publish_comment = publish_comment + packet.payload.toString() + "\n";
+    publish_comment = packet.payload.toString() + "\n";
 });
 
 function get_json() {
