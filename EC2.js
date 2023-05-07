@@ -7,6 +7,14 @@ const mqtt_server = require('net').createServer(aedes.handle);
 const mqtt = require('mqtt')
 const mqtt_client = mqtt.connect('mqtt://localhost:1883')
 
+var AWS = require('aws-sdk');
+AWS.config.update({
+    accessKeyId: 'AKIA56MQOH3C7X25TRU2',
+    secretAccessKey: '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',
+    region: 'ap-northeast-2',
+});
+const s3 = new AWS.S3();
+
 const fs = require('fs');
 const cors = require('cors');
 const callbackUrl = 'http://127.0.0.1:3000/callback';
@@ -301,3 +309,62 @@ function mqtt_publish() {
 }
 
 setInterval(mqtt_publish, 3000);
+
+
+
+const params = {
+    Bucket: 'fitbit-json',
+    ACL: 'public-read',
+};
+
+s3.createBucket(params, function(err, data) {
+    if (err) {
+        console.log('Error creating bucket:', err);
+    }
+    else {
+        console.log('Bucket created successfully:', data.Location);
+    }
+});
+
+const uploadParams = {
+    Bucket: 'fitbit-json', //대상 버킷
+    Key: 'AccessToken.json', //키, 즉 파일 이름
+    Body: '', //내용, 즉 데이터. 하단에서 채워넣음
+};
+
+//json 파일 읽어오는 과정
+const jsonFile = 'AccessToken.json'; //경로 및 대상 파일 지정
+const file_read = fs.createReadStream(jsonFile);
+file_read.on('error', function(err) {
+    console.log('Error reading file:', err);
+});
+
+//내용 채움
+uploadParams.Body = file_read;
+
+s3.upload(uploadParams, function(err, data) { //업로드
+    if (err) {
+        console.log('Error uploading file:', err);
+    } else {
+        console.log('File uploaded successfully:', data.Location);
+    }
+});
+
+const downloadParams = {
+  Bucket: 'fitbit-json', //대상 버킷
+  Key: 'AccessToken.json', //대상 파일
+};
+
+const download_path = 'AccessToken.json'; //다운 받을 경로
+
+const file_write = fs.createWriteStream(download_path);
+
+s3.getObject(downloadParams)
+  .createReadStream()
+  .pipe(file_write)
+  .on('error', function(err) {
+    console.log('Error downloading file:', err);
+  })
+  .on('close', function() {
+    console.log('File downloaded successfully');
+}); //이게 다운로드인듯
