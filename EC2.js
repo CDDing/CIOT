@@ -430,18 +430,6 @@ function mqtt_publish() {
 
 setInterval(mqtt_publish, 3000);
 
-function testing() {
-
-
-    calc_stress();
-
-    console.log(heart_rate_data);
-}
-
 setTimeout(() => {
-    testing();
-}, 3000); // 2000ms(2초) 후에 실행
-
-
-
-//console.log(test_heart_rate_now);
+    calc_stress();
+}, 3000);
