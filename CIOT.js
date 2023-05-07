@@ -36,7 +36,6 @@ function download_heart_rate() {
         }
     });  
 }
-
 //나중에 참고할 수도 있으니 지우지마
 // console.log("heart rate time : " + response.data[0]['activities-heart-intraday']['dataset'][0]['time']);
 // console.log("heart rate value : " + response.data[0]['activities-heart-intraday']['dataset'][0]['value']);
@@ -48,7 +47,9 @@ setInterval(
     ()=>{
         axios.get(request_fitbit_url)
         .then(response => {
-            h1.textContent = heart_rate_data[0][3]; //stress level
+            download_heart_rate();
+            h1.textContent = '['+heart_rate_data[0][0]+','+heart_rate_data[0][1]
+            +','+heart_rate_data[0][2]+','+heart_rate_data[0][3]; //stress level
 
             
 
