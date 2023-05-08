@@ -216,7 +216,10 @@ const authorizationUri = client.authorizeURL({
     redirect_uri: callbackUrl,
 }).replace('api', 'www');
 
+
 app.use(cors());
+
+
 app.get('/auth', (req, res) => {
     console.log(authorizationUri);
     res.redirect(authorizationUri);
