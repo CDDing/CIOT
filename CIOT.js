@@ -4,6 +4,9 @@ const button = document.getElementById("button");
 const h1 = document.getElementById("h1");
 const h2 = document.getElementById("h2");
 const h3 = document.getElementById("h3");
+const h4 = document.getElementById("h4");
+const h5 = document.getElementById("h5");
+const h6 = document.getElementById("h6");
 //const request_fitbit_url = "http://127.0.0.1:3000/getrealtime";
 //const request_publish_url = "http://127.0.0.1:3000/getpublish";
 const request_fitbit_url = "http://13.236.207.60/getrealtime";
@@ -49,13 +52,17 @@ function display_heart_rate() {
 
     var hrdl = heart_rate_data.length - 1;
 
-    h1.textContent = '['+heart_rate_data[hrdl][0]+', '+heart_rate_data[hrdl][1]+', '+heart_rate_data[hrdl][2]+', '+heart_rate_data[hrdl][3] + ']';
+    h1.textContent='날짜         : '+heart_rate_data[hrdl][0];
+    h2.textContent='시간         : '+heart_rate_data[hrdl][1];
+    h3.textContent='심박 수      : '+heart_rate_data[hrdl][2];
+    h4.textContent='스트레스 수치 : '+heart_rate_data[hrdl][3];
+    //h1.textContent = '['+heart_rate_data[hrdl][0]+', '+heart_rate_data[hrdl][1]+', '+heart_rate_data[hrdl][2]+', '+heart_rate_data[hrdl][3] + ']';
 }
 
 function display_mqtt() {
     axios.get(request_publish_url)
     .then(response => {
-        h3.textContent = response.data;
+        h5.textContent = response.data;
         //받아온 것에 변화가 있을 때 해당 부분 수정
     })
     .catch(error => {
