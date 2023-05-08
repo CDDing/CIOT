@@ -1,9 +1,5 @@
-const text = document.getElementById("text");
-
-const button = document.getElementById("button");
-const h1 = document.getElementById("h1");
-const h2 = document.getElementById("h2");
-const h3 = document.getElementById("h3");
+const AWS = require('aws-sdk');
+const fs = require('fs');
 
 AWS.config.update({
     accessKeyId: 'AKIA56MQOH3C7X25TRU2',

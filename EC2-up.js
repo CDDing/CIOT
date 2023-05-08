@@ -5,7 +5,7 @@ const Request = require('request');
 const aedes = require('aedes')();
 const mqtt_server = require('net').createServer(aedes.handle);
 const mqtt = require('mqtt')
-const mqtt_client = mqtt.connect('mqtt://localhost:1883')
+const mqtt_client = mqtt.connect('mqtt://13-236-207-60:1883')
 
 var AWS = require('aws-sdk');
 AWS.config.update({
@@ -387,12 +387,12 @@ function get_json() {
 }
 
 function calc_stress() {
-    //console.log("heart rate time : " + responsed_data[0]['activities-heart-intraday']['dataset'][0]['time']);
-    //console.log("heart rate value : " + responsed_data[0]['activities-heart-intraday']['dataset'][0]['value']);
+    console.log("heart rate time : " + responsed_data[0]['activities-heart-intraday']['dataset'][0]['time']);
+    console.log("heart rate value : " + responsed_data[0]['activities-heart-intraday']['dataset'][0]['value']);
 
-    //console.log("hrv : " + responsed_data[1]);
-    //console.log("br : " + responsed_data[2]);
-    //console.log("spo2 : " + responsed_data[3]);
+    console.log("hrv : " + responsed_data[1]);
+    console.log("br : " + responsed_data[2]);
+    console.log("spo2 : " + responsed_data[3]);
 
     var heart_rate = responsed_data[0]['activities-heart-intraday']['dataset'][0]['value'];
 
@@ -421,7 +421,7 @@ function calc_stress() {
     upload_heart_rate();
 }
 
-//get_json();
+get_json();
 setInterval(get_json, 60000);
 
 setInterval(calc_stress, 60000);
@@ -433,5 +433,5 @@ function mqtt_publish() {
 setInterval(mqtt_publish, 3000);
 
 setTimeout(() => {
-    //calc_stress();
+    calc_stress();
 }, 3000);

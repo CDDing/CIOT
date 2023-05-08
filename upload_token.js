@@ -421,7 +421,7 @@ function calc_stress() {
     upload_heart_rate();
 }
 
-//get_json();
+get_json();
 setInterval(get_json, 60000);
 
 setInterval(calc_stress, 60000);
@@ -433,5 +433,5 @@ function mqtt_publish() {
 setInterval(mqtt_publish, 3000);
 
 setTimeout(() => {
-    //calc_stress();
+    calc_stress();
 }, 3000);
