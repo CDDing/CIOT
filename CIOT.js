@@ -55,7 +55,7 @@ function display_heart_rate() {
     h1.textContent='날짜         : '+heart_rate_data[hrdl][0];
     h2.textContent='시간         : '+heart_rate_data[hrdl][1];
     h3.textContent='심박 수      : '+heart_rate_data[hrdl][2];
-    h4.textContent='스트레스 수치 : '+heart_rate_data[hrdl][3];
+    h4.textContent='스트레스 레벨 : '+heart_rate_data[hrdl][3];
     //h1.textContent = '['+heart_rate_data[hrdl][0]+', '+heart_rate_data[hrdl][1]+', '+heart_rate_data[hrdl][2]+', '+heart_rate_data[hrdl][3] + ']';
 }
 

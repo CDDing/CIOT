@@ -4,8 +4,8 @@ const Request = require('request');
 
 const aedes = require('aedes')();
 const mqtt_server = require('net').createServer(aedes.handle);
-const mqtt = require('mqtt')
-const mqtt_client = mqtt.connect('mqtt://localhost:1883')
+const mqtt = require('mqtt');
+const mqtt_client = mqtt.connect('mqtt://localhost:1883');
 
 var AWS = require('aws-sdk');
 AWS.config.update({
@@ -51,16 +51,9 @@ var today_time2 = today_hour + ":" + today_min_next;
 var detail_level = '1sec' //can use    1sec | 1min | 5min | 15min  string
 
 var heart_rate_now = "/activities/heart/date/" + today_full + '/' + today_full + '/' + detail_level + '/time/' + today_time1 + '/' + today_time2 + ".json"; //https://dev.fitbit.com/build/reference/web-api/intraday/get-heartrate-intraday-by-interval/
-var hrv_now = "/hrv/date/today/today/all.json";
-var br_now = "/br/date/today/today/all.json";
-var spo2_now = "/spo2/date/today/today/all.json";
-
 var test_heart_rate_now = "/activities/heart/date/2023-05-04/2023-05-04/" + detail_level + '/time/13:40/13:41.json';
-//var test_heart_rate_now = "/activities/heart/date/" + today_full + '/' + today_full + '/' + detail_level + '/time/' + today_time1 + '/' + today_time2 + '.json';
 
-//var request_json_list = [heart_rate_now, hrv_now, br_now, spo2_now];
-
-var request_json_list = [test_heart_rate_now];
+var request_json_list = [heart_rate_now];
 
 var active_element = false;
 function set_time_now(act) {
@@ -315,13 +308,14 @@ app.get('/refresh', (req, res) => {
 app.listen(3000, () => {
     console.log('click here to start http://127.0.0.1:3000/auth\n');
 
-    console.log('test json http://127.0.0.1:3000/getdata?request_json=' + test_heart_rate_now + "\n");
+    //console.log('test json http://127.0.0.1:3000/getdata?request_json=' + test_heart_rate_now + "\n");
 });
 app.get('/getpublish', (req, res) => {
     res.send(publish_comment);
 });
 app.get('/getrealtime', (req, res) => {
-    var requestURL = 'https://api.fitbit.com/1.2/user/-/';
+    //var requestURL = 'https://api.fitbit.com/1.2/user/-/'; ori
+    var requestURL = 'https://api.fitbit.com/1/user/-/';
 
     set_time_now(active_element);
     
