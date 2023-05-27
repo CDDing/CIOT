@@ -6,6 +6,7 @@ const aedes = require('aedes')();
 const mqtt_server = require('net').createServer(aedes.handle);
 const mqtt = require('mqtt');
 const mqtt_client = mqtt.connect('mqtt://localhost:1883');
+const mqtt_client_ec2 = mqtt.connect('mqtt://13.236.207.60:1883');
 
 var AWS = require('aws-sdk');
 AWS.config.update({
@@ -380,7 +381,6 @@ aedes.on('publish', function (packet, client) {
 
 function get_json() {
     axios.get("http://127.0.0.1:3000/getrealtime");
-
 }
 
 function calc_stress() {

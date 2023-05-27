@@ -1,5 +1,6 @@
-const mqtt=require('mqtt')
-const client=mqtt.connect('mqtt://localhost:1883')
+const mqtt=require('mqtt');
+const client=mqtt.connect('mqtt://localhost:1883');
+const client_ec2=mqtt.connect('mqtt://13.236.207.60:1883');
 
 client.subscribe('stress_level')
 
@@ -25,7 +26,7 @@ client.on('message', function(topic, message){
             console.log('stress level : 4');
             break;
         default:
-            console.log('unknown error');
+            console.log('unknown error occured');
             break;
     }    
 });

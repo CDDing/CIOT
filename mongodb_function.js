@@ -33,6 +33,8 @@ async function deleteDocument(hco, deleteFilter) {
 }
 
 async function mongo_session(command = 'no', db_name = 'admin', collection_name = 'te', data = { }, chdata = { }) {
+    var ret;
+
     try {
         await client.connect(); // MongoDB 서버에 연결
         console.log('Connected to MongoDB');
@@ -73,11 +75,26 @@ async function mongo_session(command = 'no', db_name = 'admin', collection_name 
 
         await client.close();
         console.log('Disconnected from MongoDB');
+
+        ret = 0;
     } catch (error) {
         console.error('Failed to connect to MongoDB', error);
+
+        ret = 1;
     }
+
+    return ret;
 }
 
-//mongo_session('read', undefined, 'te', { name: 'John', age: 30 });
-mongo_session('read', 'admin', 'te', { name: 'John', age: 30 });
+module.exports = {
+    mongo_session
+    //,another
+};
+
+//mongo_session('create', undefined, undefined, { name: 'John', age: 30 });
+
+//mongo_session('create', 'admin', 'te', { name: 'John', age: 30 });
+//mongo_session('read', 'admin', 'te', { name: 'John', age: 30 });
 //mongo_session('update', 'admin', 'te', { name: 'John', age: 30 }, { $set: { age: 35 } });
+//mongo_session('read', 'admin', 'te', { name: 'John'});
+//mongo_session('delete', 'admin', 'te', { name: 'John', age: 30 });
